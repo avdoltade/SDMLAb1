@@ -1,0 +1,36 @@
+delimiter //
+create procedure accinterest4()
+begin
+declare vaccno,vcid int;
+declare vacctype varchar(20);
+declare vbalance float(8,2);
+declare vtotal_amt float(8,2);
+declare msg varchar(50);
+declare vfinished int default 0;
+
+declare empcur cursor for select acc_no,acc_type,balance,
+cust_no from Account;
+declare continue handler for NOT FOUND set vfinished=1;
+
+open empcur;
+label1:loop
+fetch empcur into vaccno,vacctype,vbalance,vcid;
+if vfinished=1 then
+leave label1;
+end if;
+
+
+if vbalance>60000 then
+set vtotal_amt= vbalance+(vbalance*0.03);
+update account set balance  = vtotal_amt 
+where acc_no=vaccno;
+
+else
+set msg='No Interest';
+end if;
+
+select vaccno,vacctype,vbalance,vcid,vtotal_amt,msg;
+end loop;
+close empcur;
+end//
+
